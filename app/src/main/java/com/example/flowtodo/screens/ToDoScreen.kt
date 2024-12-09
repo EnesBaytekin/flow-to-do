@@ -6,10 +6,13 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -19,8 +22,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -56,12 +59,28 @@ fun ToDoScreen(navController: NavController? = null) {
     val taskDao = db.taskDao()
     val coroutineScope = rememberCoroutineScope()
 
-    var tasks by remember { mutableStateOf<List<Task>>(emptyList()) }
+    var tasks by rememberSaveable { mutableStateOf<List<Task>>(emptyList()) }
 
-    var showAddToDoDialog by remember { mutableStateOf(false) }
+    var showAddToDoDialog by rememberSaveable { mutableStateOf(false) }
+
+    var showDeletionPopup by rememberSaveable { mutableStateOf(false) }
+    var deletionPopupId by rememberSaveable { mutableStateOf(0) }
 
     LaunchedEffect(Unit) {
         tasks = taskDao.getAllTasks()
+    }
+
+    if (showDeletionPopup) {
+        DialogDeletion(
+            onCancel = { showDeletionPopup = false },
+            onConfirm = {
+                showDeletionPopup = false
+                coroutineScope.launch {
+                    taskDao.deleteTaskById(deletionPopupId)
+                    tasks = taskDao.getAllTasks()
+                }
+            }
+        )
     }
 
     Surface(
@@ -71,25 +90,26 @@ fun ToDoScreen(navController: NavController? = null) {
         if (showAddToDoDialog) {
             DialogAddToDo(
                 onDismissRequest = { showAddToDoDialog = false },
-                onConfirm = { name: String ->
+                onConfirm = { task: Task ->
                     showAddToDoDialog = false
                     coroutineScope.launch {
-                        taskDao.insertTask(Task(title = name))
+                        taskDao.insertTask(task)
                         tasks = taskDao.getAllTasks()
                     }
                 }
             )
         }
-        Column(
-            horizontalAlignment = Alignment.End,
-            verticalArrangement = Arrangement.SpaceBetween
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
         ) {
             LazyColumn(
+                horizontalAlignment = Alignment.Start,
+                verticalArrangement = Arrangement.Top,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(15.dp),
-                horizontalAlignment = Alignment.Start,
-                verticalArrangement = Arrangement.Top
+                    .padding(16.dp)
+                    .padding(bottom = 40.dp)
             ) {
                 items(tasks) { task ->
                     ToDoItem(
@@ -99,24 +119,51 @@ fun ToDoScreen(navController: NavController? = null) {
                                 taskDao.toggleTaskCompletion(task.id)
                                 tasks = taskDao.getAllTasks()
                             }
+                        },
+                        openDeletionPopup = {
+                            showDeletionPopup = true
+                            deletionPopupId = task.id
                         }
                     )
                 }
             }
-            ButtonAddToDo(onClick = { showAddToDoDialog = true })
+            ButtonAddToDo(
+                onClick = { showAddToDoDialog = true },
+                modifier = Modifier
+                    .align(Alignment.BottomEnd))
         }
     }
 }
 
 @Composable
-fun DialogAddToDo(onDismissRequest: () -> Unit = {}, onConfirm: (String) -> Unit = {}) {
-    var name by remember { mutableStateOf("") }
-    var description by remember { mutableStateOf("") }
-    Dialog(onDismissRequest) {
+fun DialogDeletion(onCancel: () -> Unit, onConfirm: () -> Unit) {
+    AlertDialog(
+        text = {
+            Text("Do you really want to delete this To-Do?")
+        },
+        onDismissRequest = onCancel,
+        confirmButton = {
+            Button(onClick = onConfirm) {
+                Text("Delete")
+            }
+        },
+        dismissButton = {
+            Button(onClick = onCancel) {
+                Text("Cancel")
+            }
+        }
+    )
+}
+
+@Composable
+fun DialogAddToDo(onDismissRequest: () -> Unit = {}, onConfirm: (Task) -> Unit = {}) {
+    var title by rememberSaveable { mutableStateOf("") }
+    var description by rememberSaveable { mutableStateOf("") }
+    Dialog(onDismissRequest = { }) {
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(400.dp)
+                .height(350.dp)
         ) {
             Column(
                 verticalArrangement = Arrangement.SpaceBetween,
@@ -132,8 +179,8 @@ fun DialogAddToDo(onDismissRequest: () -> Unit = {}, onConfirm: (String) -> Unit
                 )
                 Column {
                     TextField(
-                        value = name,
-                        onValueChange = { name = it },
+                        value = title,
+                        onValueChange = { title = it },
                         singleLine = true,
                         label = {
                             Text("Title")
@@ -151,7 +198,7 @@ fun DialogAddToDo(onDismissRequest: () -> Unit = {}, onConfirm: (String) -> Unit
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(top = 16.dp)
-                            .height(200.dp)
+                            .height(150.dp)
                     )
                 }
                 Row(
@@ -164,7 +211,13 @@ fun DialogAddToDo(onDismissRequest: () -> Unit = {}, onConfirm: (String) -> Unit
                         Text("Cancel")
                     }
                     Button(
-                        onClick = { onConfirm(name) },
+                        onClick = {
+                            if (title != "") {
+                                onConfirm(Task(title = title, description = description))
+                                title = ""
+                                description = ""
+                            }
+                        },
                     ) {
                         Text("Create")
                     }
@@ -175,9 +228,9 @@ fun DialogAddToDo(onDismissRequest: () -> Unit = {}, onConfirm: (String) -> Unit
 }
 
 @Composable
-fun ButtonAddToDo(onClick: () -> Unit = {}) {
+fun ButtonAddToDo(onClick: () -> Unit = {}, modifier: Modifier = Modifier) {
     Box(
-        modifier = Modifier
+        modifier = modifier
             .padding(8.dp)
     ) {
         Button(
@@ -208,7 +261,7 @@ fun ButtonAddToDo(onClick: () -> Unit = {}) {
 }
 
 @Composable
-fun ToDoItem(task: Task, onCheckedChange: () -> Unit = {}) {
+fun ToDoItem(task: Task, onCheckedChange: () -> Unit = {}, openDeletionPopup: () -> Unit = {}) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -221,11 +274,14 @@ fun ToDoItem(task: Task, onCheckedChange: () -> Unit = {}) {
                 checked = task.isCompleted,
                 onCheckedChange = { onCheckedChange() }
             )
-            Row(
+            Box(
                 modifier = Modifier
+                    .fillMaxWidth()
                     .padding(vertical = 10.dp)
             ) {
-                Column {
+                Column(modifier = Modifier
+                    .padding(end = 40.dp)
+                ) {
                     Text(
                         text = task.title,
                         style = TextStyle(fontWeight = FontWeight.Bold),
@@ -233,11 +289,18 @@ fun ToDoItem(task: Task, onCheckedChange: () -> Unit = {}) {
                             .padding(bottom = 4.dp)
                     )
                     Text(
-                        text = "explanation",
+                        text = task.description,
                         fontStyle = FontStyle.Italic,
                         fontSize = 12.sp,
                         lineHeight = 16.sp,
                     )
+                }
+                IconButton(
+                    onClick = openDeletionPopup,
+                    modifier = Modifier
+                        .align(Alignment.CenterEnd)
+                ) {
+                    Icon(Icons.Default.Delete, "delete task")
                 }
             }
         }

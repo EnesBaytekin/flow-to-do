@@ -12,4 +12,7 @@ interface TaskDao {
 
     @Query("UPDATE task_table SET isCompleted = NOT isCompleted WHERE id = :taskId")
     suspend fun toggleTaskCompletion(taskId: Int)
+
+    @Query("DELETE FROM task_table WHERE id = :taskId")
+    suspend fun deleteTaskById(taskId: Int)
 }

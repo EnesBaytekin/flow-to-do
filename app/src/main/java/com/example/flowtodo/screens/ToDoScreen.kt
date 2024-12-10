@@ -1,25 +1,17 @@
 package com.example.flowtodo.screens
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -29,20 +21,19 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import com.example.flowtodo.AppDatabase
+import com.example.flowtodo.DialogAddToDo
+import com.example.flowtodo.DialogDeletion
+import com.example.flowtodo.DialogEditToDo
 import com.example.flowtodo.FlowToDo
 import com.example.flowtodo.Task
+import com.example.flowtodo.ToDoItem
 import com.example.flowtodo.ui.theme.FlowToDoTheme
 import kotlinx.coroutines.launch
 
@@ -70,6 +61,9 @@ fun ToDoScreen(navController: NavController? = null) {
     var showDeletionPopup by rememberSaveable { mutableStateOf(false) }
     var deletionPopupId by rememberSaveable { mutableStateOf(0) }
 
+    var showEditToDoDialog by rememberSaveable { mutableStateOf(false) }
+    var editPopupId by rememberSaveable { mutableStateOf(0) }
+
     LaunchedEffect(Unit) {
         tasks = taskDao.getAllTasks()
     }
@@ -86,23 +80,28 @@ fun ToDoScreen(navController: NavController? = null) {
             }
         )
     }
+    if (showAddToDoDialog) {
+        DialogAddToDo(
+            onDismissRequest = { showAddToDoDialog = false },
+            onConfirm = { task: Task ->
+                showAddToDoDialog = false
+                coroutineScope.launch {
+                    taskDao.insertTask(task)
+                    tasks = taskDao.getAllTasks()
+                }
+            }
+        )
+    }
+    if (showEditToDoDialog) {
+        DialogEditToDo(
+            onDismissRequest = { showEditToDoDialog = false },
+        )
+    }
 
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
     ) {
-        if (showAddToDoDialog) {
-            DialogAddToDo(
-                onDismissRequest = { showAddToDoDialog = false },
-                onConfirm = { task: Task ->
-                    showAddToDoDialog = false
-                    coroutineScope.launch {
-                        taskDao.insertTask(task)
-                        tasks = taskDao.getAllTasks()
-                    }
-                }
-            )
-        }
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -127,6 +126,10 @@ fun ToDoScreen(navController: NavController? = null) {
                         openDeletionPopup = {
                             showDeletionPopup = true
                             deletionPopupId = task.id
+                        },
+                        openEditToDoDialog = {
+                            showEditToDoDialog = true
+                            editPopupId = task.id
                         }
                     )
                 }
@@ -135,98 +138,6 @@ fun ToDoScreen(navController: NavController? = null) {
                 onClick = { showAddToDoDialog = true },
                 modifier = Modifier
                     .align(Alignment.BottomEnd))
-        }
-    }
-}
-
-@Composable
-fun DialogDeletion(onCancel: () -> Unit, onConfirm: () -> Unit) {
-    AlertDialog(
-        text = {
-            Text("Do you really want to delete this To-Do?")
-        },
-        onDismissRequest = onCancel,
-        confirmButton = {
-            Button(onClick = onConfirm) {
-                Text("Delete")
-            }
-        },
-        dismissButton = {
-            Button(onClick = onCancel) {
-                Text("Cancel")
-            }
-        }
-    )
-}
-
-@Composable
-fun DialogAddToDo(onDismissRequest: () -> Unit = {}, onConfirm: (Task) -> Unit = {}) {
-    var title by rememberSaveable { mutableStateOf("") }
-    var description by rememberSaveable { mutableStateOf("") }
-    Dialog(onDismissRequest = { }) {
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(350.dp)
-        ) {
-            Column(
-                verticalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(8.dp)
-            ) {
-                Text(
-                    text = "New To-Do",
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 24.sp,
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
-                )
-                Column {
-                    OutlinedTextField(
-                        value = title,
-                        onValueChange = { title = it },
-                        singleLine = true,
-                        label = {
-                            Text("Title")
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 16.dp)
-                    )
-                    OutlinedTextField(
-                        value = description,
-                        onValueChange = { description = it },
-                        label = {
-                            Text("Description")
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 16.dp)
-                            .height(150.dp)
-                    )
-                }
-                Row(
-                    horizontalArrangement = Arrangement.SpaceAround,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Button(
-                        onClick = { onDismissRequest() },
-                    ) {
-                        Text("Cancel")
-                    }
-                    Button(
-                        onClick = {
-                            if (title != "") {
-                                onConfirm(Task(title = title, description = description))
-                                title = ""
-                                description = ""
-                            }
-                        },
-                    ) {
-                        Text("Create")
-                    }
-                }
-            }
         }
     }
 }
@@ -256,99 +167,10 @@ fun ButtonAddToDo(onClick: () -> Unit = {}, modifier: Modifier = Modifier) {
                 )
                 Icon(
                     imageVector = Icons.Default.Add,
-                    contentDescription = "Add ToDo",
+                    contentDescription = "Add To-Do",
                     modifier = Modifier.size(20.dp)
                 )
             }
-        }
-    }
-}
-
-@Composable
-fun ToDoItem(task: Task, onCheckedChange: () -> Unit = {}, openDeletionPopup: () -> Unit = {}) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 2.dp)
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Checkbox(
-                checked = task.isCompleted,
-                onCheckedChange = { onCheckedChange() }
-            )
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 10.dp)
-            ) {
-                Column(
-                    verticalArrangement = Arrangement.Center,
-                    modifier = Modifier
-                        .wrapContentHeight(unbounded = true)
-                        .heightIn(50.dp)
-                        .padding(end = 40.dp)
-                ) {
-                    Text(
-                        text = task.title,
-                        style = TextStyle(fontWeight = FontWeight.Bold)
-                    )
-                    if (task.description != "") {
-                        Text(
-                            text = task.description,
-                            fontStyle = FontStyle.Italic,
-                            fontSize = 12.sp,
-                            lineHeight = 16.sp,
-                            modifier = Modifier
-                                .padding(top = 4.dp)
-                        )
-                    }
-                }
-                IconButton(
-                    onClick = openDeletionPopup,
-                    modifier = Modifier
-                        .align(Alignment.CenterEnd)
-                ) {
-                    Icon(Icons.Default.Delete, "delete task")
-                }
-            }
-        }
-    }
-}
-
-@Preview
-@Composable
-fun PreviewLazyColumn() {
-    var tasks by rememberSaveable { mutableStateOf<List<Task>>(listOf(
-        Task(
-            title = "some title",
-            description = "some description"
-        ),
-        Task(
-            title = "some other title",
-            description = "some different description, some different description some different description some different description some different description some different description some different description some different description some different description some different description some different description some different description"
-        ),
-        Task(
-            title = "other title",
-            description = ""
-        )
-    )) }
-    LazyColumn(
-        horizontalAlignment = Alignment.Start,
-        verticalArrangement = Arrangement.Top,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
-            .padding(bottom = 40.dp)
-    ) {
-        items(tasks) { task ->
-            ToDoItem(
-                task = task,
-                onCheckedChange = {},
-                openDeletionPopup = {}
-            )
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.example.flowtodo.screens
 
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -92,9 +93,19 @@ fun ToDoScreen(navController: NavController? = null) {
             }
         )
     }
-    if (showEditToDoDialog) {
+    val taskToEdit = tasks.find { it.id == editPopupId }
+    if (showEditToDoDialog and (taskToEdit != null)) {
+        Log.v("EditPopup", "editPopupId: $editPopupId, tasks: ${taskToEdit}")
         DialogEditToDo(
+            task = taskToEdit!!,
             onDismissRequest = { showEditToDoDialog = false },
+            onConfirm = { task: Task ->
+                showEditToDoDialog = false
+                coroutineScope.launch {
+                    taskDao.updateTask(task)
+                    tasks = taskDao.getAllTasks()
+                }
+            }
         )
     }
 

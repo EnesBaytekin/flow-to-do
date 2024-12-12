@@ -101,15 +101,33 @@ fun PreviewLazyColumn() {
     var tasks by rememberSaveable { mutableStateOf<List<Task>>(listOf(
         Task(
             title = "some title",
-            description = "some description"
+            description = "some description",
+            fromHour = 0,
+            fromMinute = 0,
+            fromWeekday = 0,
+            toHour = 0,
+            toMinute = 0,
+            toWeekday = 0
         ),
         Task(
             title = "some other title",
-            description = "some different description, some different description some different description some different description some different description some different description some different description some different description some different description some different description some different description some different description"
+            description = "some different description, some different description some different description some different description some different description some different description some different description some different description some different description some different description some different description some different description",
+            fromHour = 0,
+            fromMinute = 0,
+            fromWeekday = 0,
+            toHour = 0,
+            toMinute = 0,
+            toWeekday = 0
         ),
         Task(
             title = "other title",
-            description = ""
+            description = "",
+            fromHour = 0,
+            fromMinute = 0,
+            fromWeekday = 0,
+            toHour = 0,
+            toMinute = 0,
+            toWeekday = 0
         )
     )) }
     LazyColumn(

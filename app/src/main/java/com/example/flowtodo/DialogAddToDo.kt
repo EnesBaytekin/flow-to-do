@@ -37,10 +37,12 @@ fun DialogAddToDo(onDismissRequest: () -> Unit = {}, onConfirm: (Task) -> Unit =
     val currentHour = calendar.get(Calendar.HOUR_OF_DAY)
     val currentMinute = calendar.get(Calendar.MINUTE)
 
-    var fromHour by rememberSaveable { mutableIntStateOf(currentHour) }
-    var fromMinute by rememberSaveable { mutableIntStateOf((currentMinute/30)*30) }
-    var toHour by rememberSaveable { mutableIntStateOf((currentHour+1)%24) }
-    var toMinute by rememberSaveable { mutableIntStateOf((currentMinute/30)*30) }
+    var fromHour by rememberSaveable { mutableIntStateOf((currentHour+0.5).toInt()%24) }
+    var fromMinute by rememberSaveable { mutableIntStateOf((currentMinute/30+1)*30) }
+    var fromWeekday by rememberSaveable { mutableIntStateOf(0) }
+    var toHour by rememberSaveable { mutableIntStateOf((currentHour+1.5).toInt()%24) }
+    var toMinute by rememberSaveable { mutableIntStateOf((currentMinute/30+1)*30) }
+    var toWeekday by rememberSaveable { mutableIntStateOf(0) }
 
     var showFromTimePicker by remember { mutableStateOf(false) }
     if (showFromTimePicker) {
@@ -152,7 +154,16 @@ fun DialogAddToDo(onDismissRequest: () -> Unit = {}, onConfirm: (Task) -> Unit =
                     Button(
                         onClick = {
                             if (title != "") {
-                                onConfirm(Task(title = title, description = description))
+                                onConfirm(Task(
+                                    title = title,
+                                    description = description,
+                                    fromHour = fromHour,
+                                    fromMinute = fromMinute,
+                                    fromWeekday = fromWeekday,
+                                    toHour = toHour,
+                                    toMinute = toMinute,
+                                    toWeekday = toWeekday
+                                ))
                                 title = ""
                                 description = ""
                             }

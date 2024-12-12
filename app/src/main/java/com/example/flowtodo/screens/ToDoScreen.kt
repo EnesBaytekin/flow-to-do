@@ -105,7 +105,13 @@ fun ToDoScreen(navController: NavController? = null) {
                     taskDao.updateTask(task)
                     tasks = taskDao.getAllTasks()
                 }
-            }
+            },
+            initialFromHour = taskToEdit.fromHour,
+            initialFromMinute = taskToEdit.fromMinute,
+            initialFromWeekday = taskToEdit.fromWeekday,
+            initialToHour = taskToEdit.toHour,
+            initialToMinute = taskToEdit.toMinute,
+            initialToWeekday = taskToEdit.toWeekday,
         )
     }
 

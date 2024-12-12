@@ -36,16 +36,20 @@ fun DialogEditToDo(
     onConfirm: (Task) -> Unit = { },
     initialFromHour: Int = 0,
     initialFromMinute: Int = 0,
+    initialFromWeekday: Int = 0,
     initialToHour: Int = 0,
-    initialToMinute: Int = 0
+    initialToMinute: Int = 0,
+    initialToWeekday: Int = 0
 ) {
     var title by rememberSaveable { mutableStateOf(task.title) }
     var description by rememberSaveable { mutableStateOf(task.description) }
 
     var fromHour by rememberSaveable { mutableIntStateOf(initialFromHour) }
     var fromMinute by rememberSaveable { mutableIntStateOf(initialFromMinute) }
+    var fromWeekday by rememberSaveable { mutableIntStateOf(initialFromWeekday) }
     var toHour by rememberSaveable { mutableIntStateOf(initialToHour) }
     var toMinute by rememberSaveable { mutableIntStateOf(initialToMinute) }
+    var toWeekday by rememberSaveable { mutableIntStateOf(initialToWeekday) }
 
     var showFromTimePicker by remember { mutableStateOf(false) }
     if (showFromTimePicker) {
@@ -168,7 +172,13 @@ fun DialogEditToDo(
                                         id = task.id,
                                         title = title,
                                         description = description,
-                                        task.isCompleted
+                                        task.isCompleted,
+                                        fromHour = fromHour,
+                                        fromMinute = fromMinute,
+                                        fromWeekday = fromWeekday,
+                                        toHour = toHour,
+                                        toMinute = toMinute,
+                                        toWeekday = toWeekday
                                     )
                                 )
                                 title = ""
@@ -187,5 +197,14 @@ fun DialogEditToDo(
 @Composable
 @Preview
 fun PreviewEditToDo() {
-    DialogEditToDo(Task(title = "", description = ""))
+    DialogEditToDo(Task(
+        title = "",
+        description = "",
+        fromHour = 0,
+        fromMinute = 0,
+        fromWeekday = 0,
+        toHour = 0,
+        toMinute = 0,
+        toWeekday = 0
+    ))
 }

@@ -1,12 +1,16 @@
 package com.example.flowtodo
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.OutlinedTextField
@@ -14,25 +18,69 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import java.util.Calendar
 
 @Composable
 fun DialogAddToDo(onDismissRequest: () -> Unit = {}, onConfirm: (Task) -> Unit = {}) {
     var title by rememberSaveable { mutableStateOf("") }
     var description by rememberSaveable { mutableStateOf("") }
-    Dialog(onDismissRequest = { }) {
+
+    val calendar = Calendar.getInstance()
+    val currentHour = calendar.get(Calendar.HOUR_OF_DAY)
+    val currentMinute = calendar.get(Calendar.MINUTE)
+
+    var fromHour by rememberSaveable { mutableStateOf(currentHour) }
+    var fromMinute by rememberSaveable { mutableStateOf((currentMinute/30)*30) }
+    var toHour by rememberSaveable { mutableStateOf((currentHour+1)%24) }
+    var toMinute by rememberSaveable { mutableStateOf((currentMinute/30)*30) }
+
+    var showFromTimePicker by remember { mutableStateOf(false) }
+    if (showFromTimePicker) {
+        CustomTimePicker(
+            fromHour,
+            fromMinute,
+            onDismissRequest = {
+                showFromTimePicker = false
+            },
+            onTimeSelected = { hour: Int, minute: Int ->
+                showFromTimePicker = false
+                fromHour = hour
+                fromMinute = minute
+            }
+        )
+    }
+    var showToTimePicker by remember { mutableStateOf(false) }
+    if (showToTimePicker) {
+        CustomTimePicker(
+            toHour,
+            toMinute,
+            onDismissRequest = {
+                showToTimePicker = false
+            },
+            onTimeSelected = { hour: Int, minute: Int ->
+                showToTimePicker = false
+                toHour = hour
+                toMinute = minute
+            }
+        )
+    }
+
+    Dialog(onDismissRequest = onDismissRequest) {
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(350.dp)
+                .height(450.dp)
         ) {
             Column(
                 verticalArrangement = Arrangement.SpaceBetween,
@@ -46,29 +94,54 @@ fun DialogAddToDo(onDismissRequest: () -> Unit = {}, onConfirm: (Task) -> Unit =
                     fontSize = 24.sp,
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 )
-                Column {
-                    OutlinedTextField(
-                        value = title,
-                        onValueChange = { title = it },
-                        singleLine = true,
-                        label = {
-                            Text("Title")
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 16.dp)
-                    )
-                    OutlinedTextField(
-                        value = description,
-                        onValueChange = { description = it },
-                        label = {
-                            Text("Description")
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 16.dp)
-                            .height(150.dp)
-                    )
+                LazyColumn(
+                    modifier = Modifier.weight(1f)
+                ) {
+                    item {
+                        Column {
+                            OutlinedTextField(
+                                value = title,
+                                onValueChange = { title = it },
+                                singleLine = true,
+                                label = {
+                                    Text("Title")
+                                },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 16.dp)
+                            )
+                            OutlinedTextField(
+                                value = description,
+                                onValueChange = { description = it },
+                                label = {
+                                    Text("Description")
+                                },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(150.dp)
+                            )
+                        }
+                        Row(
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            TimePickerButton(
+                                text = "From",
+                                hour = fromHour,
+                                minute = fromMinute,
+                                onClick = {
+                                    showFromTimePicker = true
+                                }
+                            )
+                            TimePickerButton(
+                                text = "To",
+                                hour = toHour,
+                                minute = toMinute,
+                                onClick = {
+                                    showToTimePicker = true
+                                }
+                            )
+                        }
+                    }
                 }
                 Row(
                     horizontalArrangement = Arrangement.SpaceAround,
@@ -100,4 +173,36 @@ fun DialogAddToDo(onDismissRequest: () -> Unit = {}, onConfirm: (Task) -> Unit =
 @Composable
 fun PreviewDialogAddToDo() {
     DialogAddToDo()
+}
+
+@Composable
+fun TimePickerButton(text: String = "time", hour: Int, minute: Int, onClick: () -> Unit) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(
+            text = text,
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .padding(top = 16.dp)
+        )
+        Box(
+            contentAlignment = Alignment.TopCenter,
+            modifier = Modifier
+                .wrapContentSize()
+                .padding(horizontal = 12.dp)
+                .clickable(
+                    onClick = onClick
+                )
+        ) {
+            Text(
+                text = "%02d:%02d".format(hour, minute),
+                fontWeight = FontWeight.ExtraBold,
+                fontSize = 40.sp,
+                modifier = Modifier
+                    .padding(horizontal = 8.dp, vertical = 8.dp)
+            )
+            }
+    }
 }

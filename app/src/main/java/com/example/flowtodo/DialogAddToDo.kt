@@ -37,11 +37,11 @@ fun DialogAddToDo(onDismissRequest: () -> Unit = {}, onConfirm: (Task) -> Unit =
     val currentHour = calendar.get(Calendar.HOUR_OF_DAY)
     val currentMinute = calendar.get(Calendar.MINUTE)
 
-    var fromHour by rememberSaveable { mutableIntStateOf((currentHour+0.5).toInt()%24) }
-    var fromMinute by rememberSaveable { mutableIntStateOf((currentMinute/30+1)*30) }
+    var fromHour by rememberSaveable { mutableIntStateOf((currentHour+((currentMinute/30+1)*30)/60+0.5).toInt()%24) }
+    var fromMinute by rememberSaveable { mutableIntStateOf(((currentMinute/30+1)*30)%60) }
     var fromWeekday by rememberSaveable { mutableIntStateOf(0) }
-    var toHour by rememberSaveable { mutableIntStateOf((currentHour+1.5).toInt()%24) }
-    var toMinute by rememberSaveable { mutableIntStateOf((currentMinute/30+1)*30) }
+    var toHour by rememberSaveable { mutableIntStateOf((currentHour+((currentMinute/30+1)*30)/60+1.5).toInt()%24) }
+    var toMinute by rememberSaveable { mutableIntStateOf(((currentMinute/30+1)*30)%60) }
     var toWeekday by rememberSaveable { mutableIntStateOf(0) }
 
     var showFromTimePicker by remember { mutableStateOf(false) }

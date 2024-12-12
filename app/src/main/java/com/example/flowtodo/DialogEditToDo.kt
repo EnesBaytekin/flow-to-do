@@ -129,7 +129,6 @@ fun DialogEditToDo(
                                 },
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(bottom = 16.dp)
                                     .height(150.dp)
                             )
                         }

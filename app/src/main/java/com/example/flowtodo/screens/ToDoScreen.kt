@@ -128,8 +128,7 @@ fun ToDoScreen(navController: NavController? = null) {
                 verticalArrangement = Arrangement.Top,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp)
-                    .padding(bottom = 40.dp)
+                    .padding(horizontal = 16.dp, vertical = 4.dp)
             ) {
                 items(tasks) { task ->
                     ToDoItem(

@@ -14,6 +14,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardColors
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -25,6 +27,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -32,6 +36,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import java.security.MessageDigest
 
 @Composable
 fun ToDoItem(
@@ -40,7 +45,14 @@ fun ToDoItem(
     openDeletionPopup: () -> Unit = {},
     openEditToDoDialog: () -> Unit = {}
 ) {
+    val customColor = Color(hashString(task.title).substring(0, 6).toInt(16))
     Card(
+        colors = CardColors(
+            containerColor = blendColors(CardDefaults.cardColors().containerColor, customColor, 0.2f),
+            contentColor = CardDefaults.cardColors().contentColor,
+            disabledContainerColor = CardDefaults.cardColors().disabledContainerColor,
+            disabledContentColor = CardDefaults.cardColors().disabledContentColor
+        ),
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 2.dp)
@@ -109,6 +121,25 @@ fun ToDoItem(
     }
 }
 
+fun blendColors(baseColor: Color, overlayColor: Color, ratio: Float = 0.5f): Color {
+    val baseRed = baseColor.red
+    val baseGreen = baseColor.green
+    val baseBlue = baseColor.blue
+    val baseAlpha = baseColor.alpha
+
+    val overlayRed = overlayColor.red
+    val overlayGreen = overlayColor.green
+    val overlayBlue = overlayColor.blue
+    val overlayAlpha = overlayColor.alpha
+
+    val mixedRed   = (1-ratio)*baseRed   + ratio*overlayRed
+    val mixedGreen = (1-ratio)*baseGreen + ratio*overlayGreen
+    val mixedBlue  = (1-ratio)*baseBlue  + ratio*overlayBlue
+    val mixedAlpha = (1-ratio)*baseAlpha + ratio*overlayAlpha
+
+    return Color(mixedRed, mixedGreen, mixedBlue, mixedAlpha)
+}
+
 @Preview
 @Composable
 fun PreviewLazyColumn() {
@@ -160,4 +191,10 @@ fun PreviewLazyColumn() {
             )
         }
     }
+}
+
+fun hashString(input: String): String {
+    val digest = MessageDigest.getInstance("SHA-256")
+    val hashBytes = digest.digest(input.toByteArray())
+    return hashBytes.joinToString("") { "%02x".format(it) }
 }

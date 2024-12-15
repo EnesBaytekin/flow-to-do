@@ -39,6 +39,7 @@ fun TimePickerButton(text: String = "time", hour: Int, minute: Int, onClick: () 
             Text(
                 text = "%02d:%02d".format(hour, minute),
                 fontWeight = FontWeight.ExtraBold,
+                textAlign = TextAlign.Center,
                 fontSize = 40.sp,
                 modifier = Modifier
                     .padding(horizontal = 8.dp, vertical = 8.dp)

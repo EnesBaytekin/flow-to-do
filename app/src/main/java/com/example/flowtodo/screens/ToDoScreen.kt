@@ -34,6 +34,7 @@ import com.example.flowtodo.DialogDeletion
 import com.example.flowtodo.DialogEditToDo
 import com.example.flowtodo.FlowToDo
 import com.example.flowtodo.Task
+import com.example.flowtodo.TaskDao
 import com.example.flowtodo.ToDoItem
 import com.example.flowtodo.ui.theme.FlowToDoTheme
 import kotlinx.coroutines.launch
@@ -46,6 +47,11 @@ fun PreviewToDoScreen() {
             FlowToDo(Modifier.padding(innerPadding))
         }
     }
+}
+
+suspend fun loadTasks(taskDao: TaskDao): List<Task> {
+    val tasks = taskDao.getAllTasks()
+    return tasks.sortedBy { it.fromHour*60+it.fromMinute }
 }
 
 @Composable
@@ -66,7 +72,7 @@ fun ToDoScreen(navController: NavController? = null) {
     var editPopupId by rememberSaveable { mutableStateOf(0) }
 
     LaunchedEffect(Unit) {
-        tasks = taskDao.getAllTasks()
+        tasks = loadTasks(taskDao)
     }
 
     if (showDeletionPopup) {
@@ -76,7 +82,7 @@ fun ToDoScreen(navController: NavController? = null) {
                 showDeletionPopup = false
                 coroutineScope.launch {
                     taskDao.deleteTaskById(deletionPopupId)
-                    tasks = taskDao.getAllTasks()
+                    tasks = loadTasks(taskDao)
                 }
             }
         )
@@ -88,7 +94,7 @@ fun ToDoScreen(navController: NavController? = null) {
                 showAddToDoDialog = false
                 coroutineScope.launch {
                     taskDao.insertTask(task)
-                    tasks = taskDao.getAllTasks()
+                    tasks = loadTasks(taskDao)
                 }
             }
         )
@@ -103,7 +109,7 @@ fun ToDoScreen(navController: NavController? = null) {
                 showEditToDoDialog = false
                 coroutineScope.launch {
                     taskDao.updateTask(task)
-                    tasks = taskDao.getAllTasks()
+                    tasks = loadTasks(taskDao)
                 }
             },
             initialFromHour = taskToEdit.fromHour,
@@ -130,13 +136,13 @@ fun ToDoScreen(navController: NavController? = null) {
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 4.dp)
             ) {
-                items(tasks) { task ->
+                items(tasks, key = { it.id }) { task ->
                     ToDoItem(
                         task = task,
                         onCheckedChange = {
                             coroutineScope.launch {
                                 taskDao.toggleTaskCompletion(task.id)
-                                tasks = taskDao.getAllTasks()
+                                tasks = loadTasks(taskDao)
                             }
                         },
                         openDeletionPopup = {

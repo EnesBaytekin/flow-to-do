@@ -66,11 +66,25 @@ fun ToDoItem(
                         .heightIn(50.dp)
                         .padding(end = 44.dp)
                 ) {
-                    Text(
-                        text = task.title,
-                        style = TextStyle(fontWeight = FontWeight.Bold),
-                        textAlign = TextAlign.Justify
-                    )
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                    ) {
+                        Text(
+                            text = task.title,
+                            style = TextStyle(fontWeight = FontWeight.Bold),
+                            textAlign = TextAlign.Justify,
+                            modifier = Modifier.weight(1f)
+                        )
+                        Text(
+                            text = "%02d:%02d\n%02d:%02d".format(task.fromHour, task.fromMinute, task.toHour, task.toMinute),
+                            fontSize = 8.sp,
+                            lineHeight = 10.sp,
+                            modifier = Modifier.padding(4.dp)
+                        )
+                    }
                     if (task.description != "") {
                         Text(
                             text = task.description,

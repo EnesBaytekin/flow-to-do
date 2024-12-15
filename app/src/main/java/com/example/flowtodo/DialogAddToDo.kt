@@ -120,6 +120,12 @@ fun DialogAddToDo(onDismissRequest: () -> Unit = {}, onConfirm: (Task) -> Unit =
                                     .height(150.dp)
                             )
                         }
+                        WeekdayPicker(
+                            startDay = fromWeekday,
+                            endDay = toWeekday,
+                            onStartDayChange = { newStartDay -> fromWeekday = newStartDay },
+                            onEndDayChange = { newEndDay -> toWeekday = newEndDay }
+                        )
                         Row(
                             horizontalArrangement = Arrangement.Center
                         ) {

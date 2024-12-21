@@ -1,6 +1,8 @@
 package com.example.flowtodo
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -8,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -17,8 +20,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 @Preview
 @Composable
@@ -38,7 +43,7 @@ fun WeekdayPicker(
     onStartDayChange: (Int) -> Unit,
     onEndDayChange: (Int) -> Unit
 ) {
-    val weekdays = listOf("Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat")
+    val weekdays = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
 
     Row(
         horizontalArrangement = Arrangement.SpaceAround,
@@ -51,28 +56,59 @@ fun WeekdayPicker(
                 modifier = Modifier
                     .weight(1f)
             ) {
-                IconButton(onClick = {
-                    onStartDayChange(index)
-                }) {
-                    Icon(
-                        Icons.Default.KeyboardArrowDown,
-                        contentDescription = "Decrease",
-                        tint = if (index == startDay)   MaterialTheme.colorScheme.outline
-                               else                     MaterialTheme.colorScheme.outlineVariant
-                    )
+                Box(
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (index == startDay) {
+                        Text(
+                            text = "from",
+                            fontSize = 8.sp,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier
+                                .padding(top = 24.dp)
+                        )
+                    }
+                    IconButton(
+                        onClick = {
+                            onStartDayChange(index)
+                        }
+                    ) {
+                        Icon(
+                            Icons.Default.KeyboardArrowDown,
+                            contentDescription = "Decrease",
+                            tint = if (index == startDay) MaterialTheme.colorScheme.outline
+                            else CardDefaults.cardColors().containerColor
+                        )
+                    }
                 }
                 Text(
-                    text = day
+                    text = day,
+                    fontWeight = FontWeight.ExtraBold
                 )
-                IconButton(onClick = {
-                    onEndDayChange(index)
-                }) {
-                    Icon(
-                        Icons.Default.KeyboardArrowUp,
-                        contentDescription = "Increase",
-                        tint = if (index == endDay) MaterialTheme.colorScheme.outline
-                               else                 MaterialTheme.colorScheme.outlineVariant
-                    )
+                Box(
+                    contentAlignment = Alignment.Center
+                ) {
+                    IconButton(
+                        onClick = {
+                            onEndDayChange(index)
+                        }
+                    ) {
+                        Icon(
+                            Icons.Default.KeyboardArrowUp,
+                            contentDescription = "Increase",
+                            tint = if (index == endDay) MaterialTheme.colorScheme.outline
+                            else CardDefaults.cardColors().containerColor
+                        )
+                    }
+                    if (index == endDay) {
+                        Text(
+                            text = "to",
+                            fontSize = 8.sp,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier
+                                .padding(bottom = 24.dp)
+                        )
+                    }
                 }
             }
         }

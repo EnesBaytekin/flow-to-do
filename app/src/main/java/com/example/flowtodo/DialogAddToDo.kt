@@ -127,7 +127,8 @@ fun DialogAddToDo(onDismissRequest: () -> Unit = {}, onConfirm: (Task) -> Unit =
                             onEndDayChange = { newEndDay -> toWeekday = newEndDay }
                         )
                         Row(
-                            horizontalArrangement = Arrangement.Center
+                            horizontalArrangement = Arrangement.Center,
+                            modifier = Modifier.fillMaxWidth()
                         ) {
                             TimePickerButton(
                                 text = "From",

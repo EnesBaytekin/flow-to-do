@@ -27,8 +27,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -45,7 +43,7 @@ fun ToDoItem(
     openDeletionPopup: () -> Unit = {},
     openEditToDoDialog: () -> Unit = {}
 ) {
-    val customColor = Color(hashString(task.title).substring(0, 6).toInt(16))
+    val customColor = getColorFromText(task.title)
     Card(
         colors = CardColors(
             containerColor = blendColors(CardDefaults.cardColors().containerColor, customColor, 0.2f),
@@ -119,25 +117,6 @@ fun ToDoItem(
             }
         }
     }
-}
-
-fun blendColors(baseColor: Color, overlayColor: Color, ratio: Float = 0.5f): Color {
-    val baseRed = baseColor.red
-    val baseGreen = baseColor.green
-    val baseBlue = baseColor.blue
-    val baseAlpha = baseColor.alpha
-
-    val overlayRed = overlayColor.red
-    val overlayGreen = overlayColor.green
-    val overlayBlue = overlayColor.blue
-    val overlayAlpha = overlayColor.alpha
-
-    val mixedRed   = (1-ratio)*baseRed   + ratio*overlayRed
-    val mixedGreen = (1-ratio)*baseGreen + ratio*overlayGreen
-    val mixedBlue  = (1-ratio)*baseBlue  + ratio*overlayBlue
-    val mixedAlpha = (1-ratio)*baseAlpha + ratio*overlayAlpha
-
-    return Color(mixedRed, mixedGreen, mixedBlue, mixedAlpha)
 }
 
 @Preview

@@ -175,6 +175,13 @@ fun ToDoScreen(navController: NavController? = null) {
                         )
                     }
                 }
+                item {
+                    Spacer(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(50.dp)
+                    )
+                }
             }
             ButtonAddToDo(
                 onClick = { showAddToDoDialog = true },

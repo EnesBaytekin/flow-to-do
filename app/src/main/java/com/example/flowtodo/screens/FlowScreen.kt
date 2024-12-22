@@ -17,7 +17,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.flowtodo.AppDatabase
+import com.example.flowtodo.DialogEditToDo
 import com.example.flowtodo.Task
+import kotlinx.coroutines.launch
 
 @Composable
 fun FlowScreen(navController: NavController) {
@@ -27,6 +29,34 @@ fun FlowScreen(navController: NavController) {
     val coroutineScope = rememberCoroutineScope()
 
     var tasks by rememberSaveable { mutableStateOf<List<List<Task>>>(emptyList()) }
+
+    var showEditToDoDialog by rememberSaveable { mutableStateOf(false) }
+    var editPopupId by rememberSaveable { mutableStateOf(0) }
+    var editPopupDay by rememberSaveable { mutableStateOf(0) }
+
+    if (tasks.isNotEmpty()) {
+        val taskToEdit = tasks[editPopupDay].find { it.id == editPopupId }
+        if (showEditToDoDialog and (taskToEdit != null)) {
+            DialogEditToDo(
+                task = taskToEdit!!,
+                onDismissRequest = { showEditToDoDialog = false },
+                onConfirm = { task: Task ->
+                    showEditToDoDialog = false
+                    coroutineScope.launch {
+                        taskDao.updateTask(task)
+                        tasks = loadTasks(taskDao)
+                    }
+                },
+                initialFromHour = taskToEdit.fromHour,
+                initialFromMinute = taskToEdit.fromMinute,
+                initialFromWeekday = taskToEdit.fromWeekday,
+                initialToHour = taskToEdit.toHour,
+                initialToMinute = taskToEdit.toMinute,
+                initialToWeekday = taskToEdit.toWeekday,
+            )
+        }
+    }
+
 
     LaunchedEffect(Unit) {
         tasks = loadTasks(taskDao)
@@ -44,7 +74,14 @@ fun FlowScreen(navController: NavController) {
                 .padding(end = 15.dp)
                 .padding(vertical = 1.dp)
         ) {
-            WeeklyTable(tasks)
+            WeeklyTable(
+                tasks = tasks,
+                openEditToDoDialog = { id: Int, day: Int ->
+                    showEditToDoDialog = true
+                    editPopupId = id
+                    editPopupDay = day
+                }
+            )
         }
     }
 }

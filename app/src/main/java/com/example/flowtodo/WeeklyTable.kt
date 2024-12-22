@@ -1,4 +1,5 @@
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -24,7 +25,10 @@ import com.example.flowtodo.getColorFromText
 import java.util.stream.IntStream.range
 
 @Composable
-fun WeeklyTable(tasks: List<List<Task>>) {
+fun WeeklyTable(
+    tasks: List<List<Task>>,
+    openEditToDoDialog: (Int, Int) -> Unit
+) {
     val headers = listOf(
         stringResource(R.string.monday),
         stringResource(R.string.tuesday),
@@ -142,7 +146,7 @@ fun WeeklyTable(tasks: List<List<Task>>) {
                         if (tasks.isNotEmpty()) {
                             for (columnIndex in range(0, 7)) {
                                 tasks[columnIndex].forEach() { task ->
-                                    TaskBox(task, taskUnitWidth, taskUnitHeight)
+                                    TaskBox(task, taskUnitWidth, taskUnitHeight, openEditToDoDialog)
                                 }
                             }
                         }
@@ -158,7 +162,8 @@ fun WeeklyTable(tasks: List<List<Task>>) {
 fun TaskBox(
     task: Task,
     taskUnitWidth: Dp,
-    taskUnitHeight: Dp
+    taskUnitHeight: Dp,
+    openEditToDoDialog: (Int, Int) -> Unit
 ) {
     val customColor = getColorFromText(task.title)
     val cardColor = blendColors(CardDefaults.cardColors().containerColor, customColor, 0.2f).copy(alpha = 0.9f)
@@ -179,7 +184,18 @@ fun TaskBox(
         val x = taskUnitWidth*(taskStartDay%7)
         val y = taskUnitHeight*taskStartHour
         val height = taskUnitHeight*(taskFinishHour-taskStartHour)
-        TaskCard(task.title, x, y, taskUnitWidth, height, cardColor, firstDay, false)
+        TaskCard(
+            task.title,
+            x, y,
+            taskUnitWidth,
+            height,
+            cardColor,
+            firstDay,
+            false,
+            openEditToDoDialog = {
+                openEditToDoDialog(task.id, task.fromWeekday)
+            }
+        )
 
         taskStartDay = (taskStartDay+1)%7
         taskStartHour = 0.0f
@@ -191,7 +207,18 @@ fun TaskBox(
     val x = taskUnitWidth*taskStartDay
     val y = taskUnitHeight*taskStartHour
     val height = taskUnitHeight*(taskFinishHour-taskStartHour)
-    TaskCard(task.title, x, y, taskUnitWidth, height, cardColor, firstDay, true)
+    TaskCard(
+        task.title,
+        x, y,
+        taskUnitWidth,
+        height,
+        cardColor,
+        firstDay,
+        true,
+        openEditToDoDialog = {
+            openEditToDoDialog(task.id, task.fromWeekday)
+        }
+    )
 }
 
 @Composable
@@ -204,6 +231,7 @@ fun TaskCard(
     cardColor: Color,
     roundTopCorners: Boolean,
     roundBottomCorners: Boolean,
+    openEditToDoDialog: () -> Unit
 ) {
     val topCorners = if (roundTopCorners) 12.dp else 0.dp
     val bottomCorners = if (roundBottomCorners) 12.dp else 0.dp
@@ -224,6 +252,7 @@ fun TaskCard(
             .offset(offsetX, offsetY)
             .size(width, height)
             .padding(end = 1.dp)
+            .clickable { openEditToDoDialog() }
     ) {
         Text(
             text = title,

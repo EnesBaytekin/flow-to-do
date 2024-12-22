@@ -1,6 +1,5 @@
 package com.example.flowtodo.screens
 
-import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -38,6 +37,7 @@ import com.example.flowtodo.TaskDao
 import com.example.flowtodo.ToDoItem
 import com.example.flowtodo.ui.theme.FlowToDoTheme
 import kotlinx.coroutines.launch
+import java.util.stream.IntStream.range
 
 @Preview(showSystemUi = true, showBackground = true)
 @Composable
@@ -49,9 +49,17 @@ fun PreviewToDoScreen() {
     }
 }
 
-suspend fun loadTasks(taskDao: TaskDao): List<Task> {
-    val tasks = taskDao.getAllTasks()
-    return tasks.sortedBy { it.fromHour*60+it.fromMinute }
+suspend fun loadTasks(taskDao: TaskDao): List<List<Task>> {
+    val allTasks = taskDao.getAllTasks()
+    val tasks = mutableListOf<List<Task>>()
+    for (i in range(0, 7)) {
+        tasks.add(
+            allTasks
+            .filter { task -> task.fromWeekday == i }
+            .sortedBy { it.fromHour*60+it.fromMinute }
+        )
+    }
+    return tasks
 }
 
 @Composable
@@ -61,7 +69,7 @@ fun ToDoScreen(navController: NavController? = null) {
     val taskDao = db.taskDao()
     val coroutineScope = rememberCoroutineScope()
 
-    var tasks by rememberSaveable { mutableStateOf<List<Task>>(emptyList()) }
+    var tasks by rememberSaveable { mutableStateOf<List<List<Task>>>(emptyList()) }
 
     var showAddToDoDialog by rememberSaveable { mutableStateOf(false) }
 
@@ -70,6 +78,7 @@ fun ToDoScreen(navController: NavController? = null) {
 
     var showEditToDoDialog by rememberSaveable { mutableStateOf(false) }
     var editPopupId by rememberSaveable { mutableStateOf(0) }
+    var editPopupDay by rememberSaveable { mutableStateOf(0) }
 
     LaunchedEffect(Unit) {
         tasks = loadTasks(taskDao)
@@ -99,26 +108,27 @@ fun ToDoScreen(navController: NavController? = null) {
             }
         )
     }
-    val taskToEdit = tasks.find { it.id == editPopupId }
-    if (showEditToDoDialog and (taskToEdit != null)) {
-        Log.v("EditPopup", "editPopupId: $editPopupId, tasks: ${taskToEdit}")
-        DialogEditToDo(
-            task = taskToEdit!!,
-            onDismissRequest = { showEditToDoDialog = false },
-            onConfirm = { task: Task ->
-                showEditToDoDialog = false
-                coroutineScope.launch {
-                    taskDao.updateTask(task)
-                    tasks = loadTasks(taskDao)
-                }
-            },
-            initialFromHour = taskToEdit.fromHour,
-            initialFromMinute = taskToEdit.fromMinute,
-            initialFromWeekday = taskToEdit.fromWeekday,
-            initialToHour = taskToEdit.toHour,
-            initialToMinute = taskToEdit.toMinute,
-            initialToWeekday = taskToEdit.toWeekday,
-        )
+    if (tasks.isNotEmpty()) {
+        val taskToEdit = tasks[editPopupDay].find { it.id == editPopupId }
+        if (showEditToDoDialog and (taskToEdit != null)) {
+            DialogEditToDo(
+                task = taskToEdit!!,
+                onDismissRequest = { showEditToDoDialog = false },
+                onConfirm = { task: Task ->
+                    showEditToDoDialog = false
+                    coroutineScope.launch {
+                        taskDao.updateTask(task)
+                        tasks = loadTasks(taskDao)
+                    }
+                },
+                initialFromHour = taskToEdit.fromHour,
+                initialFromMinute = taskToEdit.fromMinute,
+                initialFromWeekday = taskToEdit.fromWeekday,
+                initialToHour = taskToEdit.toHour,
+                initialToMinute = taskToEdit.toMinute,
+                initialToWeekday = taskToEdit.toWeekday,
+            )
+        }
     }
 
     Surface(
@@ -136,24 +146,34 @@ fun ToDoScreen(navController: NavController? = null) {
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 4.dp)
             ) {
-                items(tasks, key = { it.id }) { task ->
-                    ToDoItem(
-                        task = task,
-                        onCheckedChange = {
-                            coroutineScope.launch {
-                                taskDao.toggleTaskCompletion(task.id)
-                                tasks = loadTasks(taskDao)
+                for ((weekday, dailyTasks) in tasks.withIndex()) {
+                    if (dailyTasks.isEmpty()) { continue }
+                    val weekdayNames = listOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
+                    item {
+                        Text(
+                            text = weekdayNames[weekday]
+                        )
+                    }
+                    items(dailyTasks, key = { it.id }) { task ->
+                        ToDoItem(
+                            task = task,
+                            onCheckedChange = {
+                                coroutineScope.launch {
+                                    taskDao.toggleTaskCompletion(task.id)
+                                    tasks = loadTasks(taskDao)
+                                }
+                            },
+                            openDeletionPopup = {
+                                showDeletionPopup = true
+                                deletionPopupId = task.id
+                            },
+                            openEditToDoDialog = {
+                                showEditToDoDialog = true
+                                editPopupId = task.id
+                                editPopupDay = weekday
                             }
-                        },
-                        openDeletionPopup = {
-                            showDeletionPopup = true
-                            deletionPopupId = task.id
-                        },
-                        openEditToDoDialog = {
-                            showEditToDoDialog = true
-                            editPopupId = task.id
-                        }
-                    )
+                        )
+                    }
                 }
             }
             ButtonAddToDo(

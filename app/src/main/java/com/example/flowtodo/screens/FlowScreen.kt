@@ -4,7 +4,6 @@ import WeeklyTable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -19,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.flowtodo.AppDatabase
 import com.example.flowtodo.Task
+
 @Composable
 fun FlowScreen(navController: NavController) {
     val context = LocalContext.current
@@ -26,7 +26,7 @@ fun FlowScreen(navController: NavController) {
     val taskDao = db.taskDao()
     val coroutineScope = rememberCoroutineScope()
 
-    var tasks by rememberSaveable { mutableStateOf<List<Task>>(emptyList()) }
+    var tasks by rememberSaveable { mutableStateOf<List<List<Task>>>(emptyList()) }
 
     LaunchedEffect(Unit) {
         tasks = loadTasks(taskDao)
@@ -37,9 +37,11 @@ fun FlowScreen(navController: NavController) {
         color = MaterialTheme.colorScheme.background
     ) {
         Column(
-            modifier = Modifier.fillMaxSize().padding(15.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 15.dp, vertical = 1.dp)
         ) {
             WeeklyTable(tasks)
         }

@@ -8,7 +8,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -19,13 +18,8 @@ import com.example.flowtodo.getColorFromText
 import java.util.stream.IntStream.range
 
 @Composable
-fun WeeklyTable(tasks: List<Task>) {
+fun WeeklyTable(tasks: List<List<Task>>) {
     val headers = listOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
-
-    val tasksByDay = mutableListOf<List<Task>>()
-    for (i in range(0, 7)) {
-        tasksByDay.add(tasks.filter { task -> task.fromWeekday == i })
-    }
 
     val taskUnitHeight = 40.dp
 
@@ -39,29 +33,64 @@ fun WeeklyTable(tasks: List<Task>) {
                 modifier = Modifier
                     .fillMaxHeight()
             ) {
-                for (i in range(0, 7)) {
+                for (columnIndex in range(0, 7)) {
                     Column(
                         modifier = Modifier
                             .weight(1f)
                             .fillMaxWidth()
-                            .height(taskUnitHeight*24)
-                            .background(MaterialTheme.colorScheme.surfaceContainer)
                     ) {
-                        Text(
-                            text = headers[i],
-                            textAlign = TextAlign.Center,
-                            color = MaterialTheme.colorScheme.onSurface,
-                            fontSize = 9.sp,
+                        Card(
+                            colors = CardColors(
+                                containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                                contentColor = CardDefaults.cardColors().contentColor,
+                                disabledContainerColor = CardDefaults.cardColors().disabledContainerColor,
+                                disabledContentColor = CardDefaults.cardColors().disabledContentColor
+                            ),
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .background(MaterialTheme.colorScheme.surfaceContainerHigh)
-                        )
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
                         ) {
-                            tasksByDay[i].forEach() { task ->
-                                TaskBox(task, taskUnitHeight)
+                            Card(
+                                colors = CardColors(
+                                    containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                                    contentColor = CardDefaults.cardColors().contentColor,
+                                    disabledContainerColor = CardDefaults.cardColors().disabledContainerColor,
+                                    disabledContentColor = CardDefaults.cardColors().disabledContentColor
+                                ),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+
+                            ) {
+                                Text(
+                                    text = headers[columnIndex],
+                                    textAlign = TextAlign.Center,
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                    fontSize = 9.sp,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                )
+                            }
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(taskUnitHeight * 24)
+                                    .background(MaterialTheme.colorScheme.surfaceContainer)
+                            ) {
+                                for (i in range(0, 25)) {
+                                    Box(
+                                        modifier = Modifier
+                                            .offset(0.dp, taskUnitHeight * i)
+                                            .height(1.dp)
+                                            .fillMaxWidth()
+                                            .background(MaterialTheme.colorScheme.background)
+                                    ) {
+
+                                    }
+                                }
+                                if (tasks.isNotEmpty()) {
+                                    tasks[columnIndex].forEach() { task ->
+                                        TaskBox(task, taskUnitHeight)
+                                    }
+                                }
                             }
                         }
                     }
@@ -98,7 +127,11 @@ fun TaskBox(
             .fillMaxWidth()
     ) {
         Text(
-            text = task.title
+            text = task.title,
+            fontSize = 12.sp,
+            lineHeight = 14.sp,
+            modifier = Modifier
+                .padding(2.dp)
         )
     }
 }

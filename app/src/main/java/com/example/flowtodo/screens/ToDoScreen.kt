@@ -22,6 +22,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -36,6 +37,7 @@ import com.example.flowtodo.Task
 import com.example.flowtodo.TaskDao
 import com.example.flowtodo.ToDoItem
 import com.example.flowtodo.ui.theme.FlowToDoTheme
+import com.example.flowtodo.R
 import kotlinx.coroutines.launch
 import java.util.stream.IntStream.range
 
@@ -139,6 +141,15 @@ fun ToDoScreen(navController: NavController? = null) {
             modifier = Modifier
                 .fillMaxSize()
         ) {
+            val weekdayNames = listOf(
+                stringResource(id=R.string.monday),
+                stringResource(id=R.string.tuesday),
+                stringResource(id=R.string.wednesday),
+                stringResource(id=R.string.thursday),
+                stringResource(id=R.string.friday),
+                stringResource(id=R.string.saturday),
+                stringResource(id=R.string.sunday),
+            )
             LazyColumn(
                 horizontalAlignment = Alignment.Start,
                 verticalArrangement = Arrangement.Top,
@@ -148,7 +159,6 @@ fun ToDoScreen(navController: NavController? = null) {
             ) {
                 for ((weekday, dailyTasks) in tasks.withIndex()) {
                     if (dailyTasks.isEmpty()) { continue }
-                    val weekdayNames = listOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
                     item {
                         Text(
                             text = weekdayNames[weekday]
@@ -208,7 +218,7 @@ fun ButtonAddToDo(onClick: () -> Unit = {}, modifier: Modifier = Modifier) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Add To-Do",
+                    text = stringResource(R.string.add_to_do),
                     style = TextStyle(
                         fontSize = 16.sp
                     ),
@@ -216,7 +226,7 @@ fun ButtonAddToDo(onClick: () -> Unit = {}, modifier: Modifier = Modifier) {
                 )
                 Icon(
                     imageVector = Icons.Default.Add,
-                    contentDescription = "Add To-Do",
+                    contentDescription = stringResource(R.string.add_to_do),
                     modifier = Modifier.size(20.dp)
                 )
             }

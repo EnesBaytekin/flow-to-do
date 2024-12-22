@@ -1,0 +1,34 @@
+<resources>
+    <string name="monday">Pazartesi</string>
+    <string name="tuesday">Salı</string>
+    <string name="wednesday">Çarşamba</string>
+    <string name="thursday">Perşembe</string>
+    <string name="friday">Cuma</string>
+    <string name="saturday">Cumartesi</string>
+    <string name="sunday">Pazar</string>
+    <string name="add_to_do">Görev Ekle</string>
+    <string name="new_to_do">Yeni Görev</string>
+    <string name="title">Başlık</string>
+    <string name="description">Açıklama</string>
+    <string name="from">başlangıç</string>
+    <string name="to">bitiş</string>
+    <string name="cancel">İptal</string>
+    <string name="create">Oluştur</string>
+    <string name="are_you_sure_delete">Bu görevi gerçekten silmek istediğine emin misin?</string>
+    <string name="delete">Sil</string>
+    <string name="edit_to_do">Görevi Düzenle</string>
+    <string name="save">Kaydet</string>
+    <string name="to_do_list">Görev Listesi</string>
+    <string name="weekly_flow">Haftalık Görev Listesi</string>
+    <string name="statistics">İstatistikler</string>
+    <string name="mon">Pzt</string>
+    <string name="tue">Sal</string>
+    <string name="wed">Çrş</string>
+    <string name="thu">Prş</string>
+    <string name="fri">Cum</string>
+    <string name="sat">Cmt</string>
+    <string name="sun">Paz</string>
+    <string name="todos">Görevler</string>
+    <string name="flow">Akış</string>
+    <string name="stats">İstatistik</string>
+</resources>

@@ -56,7 +56,7 @@ fun BottomNavigationBar() {
             TopAppBar(
                 title = {
                     Text(
-                        text = navController.currentDestination?.route.toString(),
+                        text = getScreenTitle(navController.currentDestination?.route),
                         style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold)
                     )
                 },

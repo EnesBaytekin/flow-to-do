@@ -8,10 +8,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.flowtodo.R
 import com.example.flowtodo.Task
 import com.example.flowtodo.blendColors
 import com.example.flowtodo.getColorFromText
@@ -19,7 +21,15 @@ import java.util.stream.IntStream.range
 
 @Composable
 fun WeeklyTable(tasks: List<List<Task>>) {
-    val headers = listOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
+    val headers = listOf(
+        stringResource(R.string.monday),
+        stringResource(R.string.tuesday),
+        stringResource(R.string.wednesday),
+        stringResource(R.string.thursday),
+        stringResource(R.string.friday),
+        stringResource(R.string.saturday),
+        stringResource(R.string.sunday),
+    )
 
     val taskUnitHeight = 40.dp
 
@@ -58,13 +68,13 @@ fun WeeklyTable(tasks: List<List<Task>>) {
                                 ),
                                 modifier = Modifier
                                     .fillMaxWidth()
-
+                                    .height(24.dp)
                             ) {
                                 Text(
                                     text = headers[columnIndex],
                                     textAlign = TextAlign.Center,
                                     color = MaterialTheme.colorScheme.onSurface,
-                                    fontSize = 9.sp,
+                                    fontSize = 8.sp,
                                     modifier = Modifier
                                         .fillMaxWidth()
                                 )

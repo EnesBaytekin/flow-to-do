@@ -27,6 +27,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -112,7 +113,7 @@ fun ToDoItem(
                     modifier = Modifier
                         .align(Alignment.CenterEnd)
                 ) {
-                    Icon(Icons.Default.Delete, "delete task")
+                    Icon(Icons.Default.Delete, stringResource(R.string.delete))
                 }
             }
         }
@@ -170,10 +171,4 @@ fun PreviewLazyColumn() {
             )
         }
     }
-}
-
-fun hashString(input: String): String {
-    val digest = MessageDigest.getInstance("SHA-256")
-    val hashBytes = digest.digest(input.toByteArray())
-    return hashBytes.joinToString("") { "%02x".format(it) }
 }

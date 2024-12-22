@@ -21,6 +21,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -88,7 +89,7 @@ fun DialogAddToDo(onDismissRequest: () -> Unit = {}, onConfirm: (Task) -> Unit =
                     .padding(8.dp)
             ) {
                 Text(
-                    text = "New To-Do",
+                    text = stringResource(R.string.new_to_do),
                     fontWeight = FontWeight.Bold,
                     fontSize = 24.sp,
                     modifier = Modifier.align(Alignment.CenterHorizontally)
@@ -103,7 +104,7 @@ fun DialogAddToDo(onDismissRequest: () -> Unit = {}, onConfirm: (Task) -> Unit =
                                 onValueChange = { title = it },
                                 singleLine = true,
                                 label = {
-                                    Text("Title")
+                                    Text(stringResource(R.string.title))
                                 },
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -113,7 +114,7 @@ fun DialogAddToDo(onDismissRequest: () -> Unit = {}, onConfirm: (Task) -> Unit =
                                 value = description,
                                 onValueChange = { description = it },
                                 label = {
-                                    Text("Description")
+                                    Text(stringResource(R.string.description))
                                 },
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -131,7 +132,7 @@ fun DialogAddToDo(onDismissRequest: () -> Unit = {}, onConfirm: (Task) -> Unit =
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             TimePickerButton(
-                                text = "From",
+                                text = stringResource(R.string.from),
                                 hour = fromHour,
                                 minute = fromMinute,
                                 onClick = {
@@ -139,7 +140,7 @@ fun DialogAddToDo(onDismissRequest: () -> Unit = {}, onConfirm: (Task) -> Unit =
                                 }
                             )
                             TimePickerButton(
-                                text = "To",
+                                text = stringResource(R.string.to),
                                 hour = toHour,
                                 minute = toMinute,
                                 onClick = {
@@ -156,7 +157,7 @@ fun DialogAddToDo(onDismissRequest: () -> Unit = {}, onConfirm: (Task) -> Unit =
                     Button(
                         onClick = { onDismissRequest() },
                     ) {
-                        Text("Cancel")
+                        Text(stringResource(R.string.cancel))
                     }
                     Button(
                         onClick = {
@@ -176,7 +177,7 @@ fun DialogAddToDo(onDismissRequest: () -> Unit = {}, onConfirm: (Task) -> Unit =
                             }
                         },
                     ) {
-                        Text("Create")
+                        Text(stringResource(R.string.create))
                     }
                 }
             }

@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun TimePickerButton(text: String = "time", hour: Int, minute: Int, onClick: () -> Unit) {
+fun TimePickerButton(text: String, hour: Int, minute: Int, onClick: () -> Unit) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center

@@ -22,6 +22,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -97,7 +98,7 @@ fun DialogEditToDo(
                     .padding(8.dp)
             ) {
                 Text(
-                    text = "Edit To-Do",
+                    text = stringResource(R.string.edit_to_do),
                     fontWeight = FontWeight.Bold,
                     fontSize = 24.sp,
                     modifier = Modifier.align(Alignment.CenterHorizontally)
@@ -115,7 +116,7 @@ fun DialogEditToDo(
                                 onValueChange = { title = it },
                                 singleLine = true,
                                 label = {
-                                    Text("Title")
+                                    Text(stringResource(R.string.title))
                                 },
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -125,7 +126,7 @@ fun DialogEditToDo(
                                 value = description,
                                 onValueChange = { description = it },
                                 label = {
-                                    Text("Description")
+                                    Text(stringResource(R.string.description))
                                 },
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -142,7 +143,7 @@ fun DialogEditToDo(
                             horizontalArrangement = Arrangement.Center
                         ) {
                             TimePickerButton(
-                                text = "From",
+                                text = stringResource(R.string.from),
                                 hour = fromHour,
                                 minute = fromMinute,
                                 onClick = {
@@ -150,7 +151,7 @@ fun DialogEditToDo(
                                 }
                             )
                             TimePickerButton(
-                                text = "To",
+                                text = stringResource(R.string.to),
                                 hour = toHour,
                                 minute = toMinute,
                                 onClick = {
@@ -167,7 +168,7 @@ fun DialogEditToDo(
                     Button(
                         onClick = { onDismissRequest() },
                     ) {
-                        Text("Cancel")
+                        Text(stringResource(R.string.cancel))
                     }
                     Button(
                         onClick = {
@@ -191,7 +192,7 @@ fun DialogEditToDo(
                             }
                         },
                     ) {
-                        Text("Save")
+                        Text(stringResource(R.string.save))
                     }
                 }
             }

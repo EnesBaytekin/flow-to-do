@@ -1,5 +1,6 @@
 package com.example.flowtodo.screens
 
+import com.example.flowtodo.R
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -7,6 +8,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 
@@ -22,7 +24,7 @@ fun StatsScreen(navController: NavController) {
             verticalArrangement = Arrangement.Center
         ) {
             Text(
-                "Stats Screen",
+                stringResource(R.string.statistics),
                 style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier.padding(vertical = 20.dp)
             )

@@ -19,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -43,7 +44,15 @@ fun WeekdayPicker(
     onStartDayChange: (Int) -> Unit,
     onEndDayChange: (Int) -> Unit
 ) {
-    val weekdays = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
+    val weekdays = listOf(
+        stringResource(R.string.mon),
+        stringResource(R.string.tue),
+        stringResource(R.string.wed),
+        stringResource(R.string.thu),
+        stringResource(R.string.fri),
+        stringResource(R.string.sat),
+        stringResource(R.string.sun)
+    )
 
     Row(
         horizontalArrangement = Arrangement.SpaceAround,
@@ -61,7 +70,7 @@ fun WeekdayPicker(
                 ) {
                     if (index == startDay) {
                         Text(
-                            text = "from",
+                            text = stringResource(R.string.from),
                             fontSize = 8.sp,
                             fontWeight = FontWeight.Bold,
                             modifier = Modifier
@@ -75,7 +84,7 @@ fun WeekdayPicker(
                     ) {
                         Icon(
                             Icons.Default.KeyboardArrowDown,
-                            contentDescription = "Decrease",
+                            contentDescription = stringResource(R.string.from),
                             tint = if (index == startDay) MaterialTheme.colorScheme.outline
                             else CardDefaults.cardColors().containerColor
                         )
@@ -95,14 +104,14 @@ fun WeekdayPicker(
                     ) {
                         Icon(
                             Icons.Default.KeyboardArrowUp,
-                            contentDescription = "Increase",
+                            contentDescription = stringResource(R.string.to),
                             tint = if (index == endDay) MaterialTheme.colorScheme.outline
                             else CardDefaults.cardColors().containerColor
                         )
                     }
                     if (index == endDay) {
                         Text(
-                            text = "to",
+                            text = stringResource(R.string.to),
                             fontSize = 8.sp,
                             fontWeight = FontWeight.Bold,
                             modifier = Modifier

@@ -140,7 +140,8 @@ fun DialogEditToDo(
                             onEndDayChange = { newEndDay -> toWeekday = newEndDay }
                         )
                         Row(
-                            horizontalArrangement = Arrangement.Center
+                            horizontalArrangement = Arrangement.Center,
+                            modifier = Modifier.fillMaxWidth()
                         ) {
                             TimePickerButton(
                                 text = stringResource(R.string.from),

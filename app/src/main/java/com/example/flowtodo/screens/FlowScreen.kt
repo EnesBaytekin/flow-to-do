@@ -41,7 +41,8 @@ fun FlowScreen(navController: NavController) {
             verticalArrangement = Arrangement.Center,
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 15.dp, vertical = 1.dp)
+                .padding(end = 15.dp)
+                .padding(vertical = 1.dp)
         ) {
             WeeklyTable(tasks)
         }
